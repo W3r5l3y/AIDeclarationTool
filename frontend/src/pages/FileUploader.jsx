@@ -22,20 +22,29 @@ function FileUploader() {
         formData.append("file", file);
 
         try {
-            const response = await fetch("http://localhost:5000/api/upload", {
-                method: "POST",
-                body: formData,
-            });
+      const response = await fetch("http://localhost:5000/api/upload", {
+        method: "POST",
+        body: formData,
+      });
 
-            if (response.ok) {
-                const data = await response.json();
-                console.log("Server response:", data);
-            } else {
-                console.error("Upload failed");
-            }
-        } catch (error) {
-            console.error("Error uploading file:", error);
-        }
+      if (!response.ok) {
+        const errMsg = await response.text(); // Backend error message
+        throw new Error(errMsg);
+      }
+
+      // Convert response to a blob
+      const blob = await response.blob();
+
+      // Create a download link
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      window.open(url, '_blank');
+      //a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Upload failed:", err);
+    }
     };
 
     return (
