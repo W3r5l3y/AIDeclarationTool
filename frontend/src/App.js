@@ -3,12 +3,12 @@ import FileUploader from "./pages/FileUploader"; // adjust the path if needed
 
 function App() {
   const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    fetch("http://localhost:5000/api/hello")
-      .then((res) => res.json())
-      .then((data) => setMessage(data.message));
-  }, []);
+ 
+  // useEffect(() => {
+  //   fetch("http://localhost:5000/api/hello")
+  //     .then((res) => res.json())
+  //     .then((data) => setMessage(data.message));
+  // }, []);
 
   return (
     <div>
