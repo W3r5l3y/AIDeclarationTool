@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import FileUploader from "./pages/FileUploader"; // adjust the path if needed
 
 function App() {
   const [message, setMessage] = useState("");
@@ -13,6 +14,8 @@ function App() {
     <div>
       <h1>React Frontend</h1>
       <p>{message}</p>
+
+      <FileUploader />
     </div>
   );
 }
