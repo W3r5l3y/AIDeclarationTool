@@ -1,30 +1,39 @@
-const express = require('express');
-const cors = require('cors');
-const multer = require('multer');
-const path = require('path');
+const express = require("express");
+const cors = require("cors");
+const multer = require("multer");
+const { PDFDocument } = require("pdf-lib");
 
 const app = express();
 app.use(cors());
 
-// Configure storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/"); // save in backend/uploads
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
-
+// Use memory storage (no files saved on disk)
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// Upload endpoint
-app.post('/api/upload', upload.single('file'), (req, res) => {
+// Endpoint to receive PDF, modify it, return it
+app.post("/api/upload", upload.single("file"), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: "No file uploaded" });
   }
-  // Later: process the file here
-  res.json({ message: `File uploaded successfully: ${req.file.filename}` });
+
+  try {
+    // Load uploaded PDF from memory
+    const pdfDoc = await PDFDocument.load(req.file.buffer);
+
+    // Add a blank page at the end
+    pdfDoc.addPage();
+
+    // Save the modified PDF
+    const pdfBytes = await pdfDoc.save();
+
+    // Send file back to frontend
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", "attachment; filename=modified.pdf");
+    res.send(Buffer.from(pdfBytes));
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error processing PDF" });
+  }
 });
 
 const PORT = 5000;
